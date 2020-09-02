@@ -1,21 +1,21 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
-
-const items = require('./routes/items');
-const { aggregate } = require('./models/Item');
+const config = require('config');
 
 const app = express();
 
 app.use(express.json());
 
-const db = require('./config/keys').mongoURI;
+const db = config.get('mongoURI');
 mongoose
-	.connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
+	.connect(db, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
 	.then(() => console.log('MongoDB Connected'))
 	.catch((err) => console.log(err));
 
-app.use('/api/items', items);
+app.use('/api/items', require('./routes/items'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/auth', require('./routes/auth'));
 
 if (process.env.NODE_ENV === 'production') {
 	app.use(express.static('client/build'));
